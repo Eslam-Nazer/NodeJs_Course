@@ -1,0 +1,4 @@
+This is the output file text
+ this is dump text in the file for testing 
+ this file created at Wed Apr 09 2025 23:33:06 GMT+0200 (Eastern European Standard Time)
+ by Eslam created at 1744234386192
