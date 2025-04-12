@@ -12,12 +12,14 @@ const server = http.createServer(function (request, response) {
 
   if (request.url == "/" || request.url == "/home") {
     // response.end("Welcome to the home page");
+    response.writeHead(200, { "Content-Type": "text/html" });
     response.end(
       html
         .replace("{{title}}", "Home Page")
         .replace("{{%CONTENT%}}", "Welcome to the home page")
     );
   } else if (request.url == "/about") {
+    response.writeHead(200, { "Content-Type": "text/html" });
     // response.end("Welcome to the about page");
     response.end(
       html
@@ -25,18 +27,21 @@ const server = http.createServer(function (request, response) {
         .replace("{{%CONTENT%}}", "Welcome to the about page")
     );
   } else if (request.url == "/product") {
+    response.writeHead(200, { "Content-Type": "text/html" });
     response.end(
       html
         .replace("{{title}}", "Product Page")
         .replace("{{%CONTENT%}}", "Welcome to the product page")
     );
   } else if (request.url == "/contact") {
+    response.writeHead(200, { "Content-Type": "text/html" });
     response.end(
       html
         .replace("{{title}}", "Contact Page")
         .replace("{{%CONTENT%}}", "Welcome to the contact page")
     );
   } else {
+    response.writeHead(404, { "Content-Type": "text/html" });
     response.end(
       html
         .replace("{{title}}", "404 Page")
