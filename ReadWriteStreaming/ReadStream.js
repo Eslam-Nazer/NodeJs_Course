@@ -28,23 +28,32 @@ server.listen(3000, "127.0.0.1", () => {
 // });
 
 // solution 2 use fs.createReadStream
+// server.on("request", (req, res) => {
+//   let rs = fs.createReadStream(
+//     path.join(__dirname, "data", "dump_info.txt"),
+//     "utf-8"
+//   );
+
+//   rs.on("data", (chunk) => {
+//     res.write(chunk);
+//   });
+
+//   rs.on("end", () => {
+//     res.end();
+//   });
+
+//   rs.on("error", (err) => {
+//     console.error("Error reading file: ", err);
+//     res.writeHead(500, { "Content-Type": "text/plan" });
+//     res.end("Internal Server Error: " + err.message);
+//   });
+// });
+
+// solution 3 use pipe
 server.on("request", (req, res) => {
   let rs = fs.createReadStream(
     path.join(__dirname, "data", "dump_info.txt"),
     "utf-8"
   );
-
-  rs.on("data", (chunk) => {
-    res.write(chunk);
-  });
-
-  rs.on("end", () => {
-    res.end();
-  });
-
-  rs.on("error", (err) => {
-    console.error("Error reading file: ", err);
-    res.writeHead(500, { "Content-Type": "text/plan" });
-    res.end("Internal Server Error: " + err.message);
-  });
+  rs.pipe(res);
 });
