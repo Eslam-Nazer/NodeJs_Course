@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Node app {{title}}</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        /* background-color: lightblue; */
+      }
+      ul {
+        list-style: none;
+        padding: 20px 0 20px;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        background-color: lightblue;
+        margin: 0;
+      }
+      ul li {
+        margin: 0 10px;
+        font-size: 22px;
+      }
+      ul li a {
+        text-decoration: none;
+        color: black;
+      }
+
+      .contact {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li><a href="/home">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/product">Product</a></li>
+      <li><a href="/contact">Contact us</a></li>
+    </ul>
+
+    <div class="contact">
+      <h1>Welcome to the Node.js app</h1>
+      <h2>{{%CONTENT%}}</h2>
+      <p>
+        This is a simple Node.js application that serves HTML pages using the
+        Express framework.
+      </p>
+    </div>
+  </body>
+</html>
