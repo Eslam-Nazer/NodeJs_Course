@@ -119,6 +119,48 @@ app.patch("/api/movies/:id", (request, response) => {
   });
 });
 
+/**
+ * @description Delete a movie by ID
+ * @route DELETE /api/movies/:id
+ */
+app.delete("/api/movies/:id", (request, response) => {
+  if (!request.params) {
+    response.status(400).json({
+      status: "fail",
+      message: "No data provided",
+    });
+  }
+
+  const id = request.params.id;
+
+  let movie = movies.find((el) => el.id === Number(id));
+
+  if (!movie) {
+    return response.status(404).json({
+      status: "fail",
+      message: "Movie not found",
+    });
+  }
+
+  const index = movies.indexOf(movie);
+
+  movies.splice(index, 1);
+
+  fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
+    if (err) {
+      return response.status(500).json({
+        status: "fail",
+        message: "Error writing to file",
+      });
+    }
+
+    response.status(204).json({
+      status: "success",
+      data: null,
+    });
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
