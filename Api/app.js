@@ -7,15 +7,23 @@ app.use(express.json());
 
 let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
 
+/**
+ * @description Get all movies
+ * @route GET /api/movies
+ */
 app.get("/api/movies", (req, res) => {
   res.status(200).json({
     status: "success",
     data: {
-      movies,
+      movies: movies,
     },
   });
 });
 
+/**
+ * @description Create a new movie
+ * @route POST /api/movies
+ */
 app.post("/api/movies", (req, res) => {
   const newId = movies[movies.length - 1].id + 1;
 
@@ -39,6 +47,31 @@ app.post("/api/movies", (req, res) => {
     });
   });
   // res.send("Movie added successfully");
+});
+
+/**
+ * @description Get a movie by ID
+ * @route GET /api/movies/:id
+ */
+app.get("/api/movies/:id", (request, response) => {
+  const id = request.params.id;
+
+  let movie = movies.find((el) => el.id === Number(id));
+
+  console.log();
+  if (!movie) {
+    return response.status(404).json({
+      status: "fail",
+      message: "Movie not found",
+    });
+  }
+
+  response.status(200).json({
+    status: "success",
+    data: {
+      movie: movie,
+    },
+  });
 });
 
 app.listen(port, () => {
