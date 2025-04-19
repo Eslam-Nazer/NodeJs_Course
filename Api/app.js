@@ -74,6 +74,51 @@ app.get("/api/movies/:id", (request, response) => {
   });
 });
 
+/**
+ * @description Update a movie by ID
+ * @route PATCH /api/movies/:id
+ */
+app.patch("/api/movies/:id", (request, response) => {
+  if (!request.body) {
+    return response.status(400).json({
+      status: "fail",
+      message: "No data provided",
+    });
+  }
+
+  const id = request.params.id;
+
+  let movie = movies.find((el) => el.id === Number(id));
+
+  if (!movie) {
+    return response.status(404).json({
+      status: "fail",
+      message: "Movie not found",
+    });
+  }
+
+  const index = movies.indexOf(movie);
+
+  movie = Object.assign(movie, request.body);
+  movies[index] = movie;
+
+  fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
+    if (err) {
+      return response.status(500).json({
+        status: "fail",
+        message: "Error writing to file",
+      });
+    }
+
+    response.status(200).json({
+      status: "success",
+      data: {
+        movie: movie,
+      },
+    });
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
