@@ -3,13 +3,25 @@ const fs = require("fs");
 const app = express();
 const port = 4000;
 
+const logger = (req, res, next) => {
+  console.log(`this is middleware: ${req.method} ${req.url}`);
+  next();
+};
+
 app.use(express.json());
+app.use(logger);
+app.use((req, res, next) => {
+  req.requestAt = new Date().toISOString();
+  next();
+});
 
 let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
 
 const getAllMovies = (req, res) => {
   res.status(200).json({
     status: "success",
+    requestedAt: req.requestAt,
+    count: movies.length,
     data: {
       movies: movies,
     },
