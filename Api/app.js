@@ -7,24 +7,23 @@ app.use(express.json());
 
 let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
 
-/**
- * @description Get all movies
- * @route GET /api/movies
- */
-app.get("/api/movies", (req, res) => {
+const getAllMovies = (req, res) => {
   res.status(200).json({
     status: "success",
     data: {
       movies: movies,
     },
   });
-});
+};
 
-/**
- * @description Create a new movie
- * @route POST /api/movies
- */
-app.post("/api/movies", (req, res) => {
+const addNewMovie = (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({
+      status: "fail",
+      message: "No data provided",
+    });
+  }
+
   const newId = movies[movies.length - 1].id + 1;
 
   let newMove = Object.assign({ id: newId }, req.body);
@@ -46,14 +45,9 @@ app.post("/api/movies", (req, res) => {
       },
     });
   });
-  // res.send("Movie added successfully");
-});
+};
 
-/**
- * @description Get a movie by ID
- * @route GET /api/movies/:id
- */
-app.get("/api/movies/:id", (request, response) => {
+const getMovieById = (request, response) => {
   const id = request.params.id;
 
   let movie = movies.find((el) => el.id === Number(id));
@@ -72,13 +66,9 @@ app.get("/api/movies/:id", (request, response) => {
       movie: movie,
     },
   });
-});
+};
 
-/**
- * @description Update a movie by ID
- * @route PATCH /api/movies/:id
- */
-app.patch("/api/movies/:id", (request, response) => {
+const updateMovieById = (request, response) => {
   if (!request.body) {
     return response.status(400).json({
       status: "fail",
@@ -117,13 +107,9 @@ app.patch("/api/movies/:id", (request, response) => {
       },
     });
   });
-});
+};
 
-/**
- * @description Delete a movie by ID
- * @route DELETE /api/movies/:id
- */
-app.delete("/api/movies/:id", (request, response) => {
+const deleteMovieById = (request, response) => {
   if (!request.params) {
     response.status(400).json({
       status: "fail",
@@ -159,7 +145,47 @@ app.delete("/api/movies/:id", (request, response) => {
       data: null,
     });
   });
-});
+};
+
+/**
+ * @description Get all movies
+ * @route GET /api/movies
+ */
+// app.get("/api/movies", getAllMovies);
+
+/**
+ * @description Create a new movie
+ * @route POST /api/movies
+ */
+// app.post("/api/movies", addNewMovie);
+
+/**
+ * @description Get a movie by ID
+ * @route GET /api/movies/:id
+ */
+// app.get("/api/movies/:id", getMovieById);
+
+/**
+ * @description Update a movie by ID
+ * @route PATCH /api/movies/:id
+ */
+// app.patch("/api/movies/:id", updateMovieById);
+
+/**
+ * @description Delete a movie by ID
+ * @route DELETE /api/movies/:id
+ */
+// app.delete("/api/movies/:id", updateMovieById);
+
+/**
+ * @description refactoring the code and shane the methods
+ */
+app.route("/api/movies").get(getAllMovies).post(addNewMovie);
+app
+  .route("/api/movies/:id")
+  .get(getMovieById)
+  .patch(updateMovieById)
+  .delete(deleteMovieById);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
