@@ -194,12 +194,15 @@ const deleteMovieById = (request, response) => {
 /**
  * @description refactoring the code and shane the methods
  */
-app.route("/api/movies").get(getAllMovies).post(addNewMovie);
-app
-  .route("/api/movies/:id")
+const moviesRouter = express.Router();
+moviesRouter.route("/").get(getAllMovies).post(addNewMovie);
+moviesRouter
+  .route("/:id")
   .get(getMovieById)
   .patch(updateMovieById)
   .delete(deleteMovieById);
+
+app.use("/api/movies", moviesRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
