@@ -1,6 +1,20 @@
 const fs = require("fs");
 let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
 
+exports.checkId = (req, res, next, value) => {
+  console.log(`Id is ${value}`);
+
+  let movie = movies.find((el) => el.id === Number(value));
+  if (!movie) {
+    return res.status(404).json({
+      status: "fail",
+      message: `Movie with ID ${value} not found`,
+    });
+  }
+  req.movie = movie;
+  next();
+};
+
 exports.getAllMovies = (req, res) => {
   res.status(200).json({
     status: "success",
@@ -44,22 +58,21 @@ exports.addNewMovie = (req, res) => {
 };
 
 exports.getMovieById = (request, response) => {
-  const id = request.params.id;
+  // const id = request.params.id;
 
-  let movie = movies.find((el) => el.id === Number(id));
+  // let movie = movies.find((el) => el.id === Number(id));
 
-  console.log();
-  if (!movie) {
-    return response.status(404).json({
-      status: "fail",
-      message: "Movie not found",
-    });
-  }
+  // if (!movie) {
+  //   return response.status(404).json({
+  //     status: "fail",
+  //     message: "Movie not found",
+  //   });
+  // }
 
   response.status(200).json({
     status: "success",
     data: {
-      movie: movie,
+      movie: request.movie,
     },
   });
 };
@@ -72,20 +85,20 @@ exports.updateMovieById = (request, response) => {
     });
   }
 
-  const id = request.params.id;
+  // const id = request.params.id;
 
-  let movie = movies.find((el) => el.id === Number(id));
+  // let movie = movies.find((el) => el.id === Number(id));
 
-  if (!movie) {
-    return response.status(404).json({
-      status: "fail",
-      message: "Movie not found",
-    });
-  }
+  // if (!movie) {
+  //   return response.status(404).json({
+  //     status: "fail",
+  //     message: "Movie not found",
+  //   });
+  // }
 
   const index = movies.indexOf(movie);
 
-  movie = Object.assign(movie, request.body);
+  let movie = Object.assign(request.movie, request.body);
   movies[index] = movie;
 
   fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
@@ -106,25 +119,25 @@ exports.updateMovieById = (request, response) => {
 };
 
 exports.deleteMovieById = (request, response) => {
-  if (!request.params) {
-    response.status(400).json({
-      status: "fail",
-      message: "No data provided",
-    });
-  }
+  // if (!request.params) {
+  //   response.status(400).json({
+  //     status: "fail",
+  //     message: "No data provided",
+  //   });
+  // }
 
-  const id = request.params.id;
+  // const id = request.params.id;
 
-  let movie = movies.find((el) => el.id === Number(id));
+  // let movie = movies.find((el) => el.id === Number(id));
 
-  if (!movie) {
-    return response.status(404).json({
-      status: "fail",
-      message: "Movie not found",
-    });
-  }
+  // if (!movie) {
+  //   return response.status(404).json({
+  //     status: "fail",
+  //     message: "Movie not found",
+  //   });
+  // }
 
-  const index = movies.indexOf(movie);
+  const index = movies.indexOf(request.movie);
 
   movies.splice(index, 1);
 
