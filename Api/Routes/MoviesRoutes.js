@@ -6,7 +6,7 @@ router.param("id", moviesController.checkId);
 router
   .route("/")
   .get(moviesController.getAllMovies)
-  .post(moviesController.addNewMovie);
+  .post(moviesController.validateMovies, moviesController.addNewMovie);
 router
   .route("/:id")
   .get(moviesController.getMovieById)

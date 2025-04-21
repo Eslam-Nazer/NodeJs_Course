@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { body, validationResult } = require("express-validator");
 let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
 
 exports.checkId = (req, res, next, value) => {
@@ -14,6 +15,37 @@ exports.checkId = (req, res, next, value) => {
   req.movie = movie;
   next();
 };
+
+exports.validateMovies = [
+  body("name").notEmpty().withMessage("Name is required"),
+  body("description").notEmpty().withMessage("Description is required"),
+  body("duration").notEmpty().withMessage("Duration is required"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "fail",
+        errors: errors.array().map((err) => ({
+          msg: err.msg,
+          field: err.path,
+        })),
+      });
+    }
+    next();
+  },
+];
+// exports.validateBody = (req, res, next) => {
+// if (!req.body.name || !req.body.description || !req.body.duration) {
+//   return res.status(400).json({
+//     status: "fail",
+//     message: `Invalid body data`,
+//   });
+// }
+//   body('name').notE
+
+//   next();
+// };
 
 exports.getAllMovies = (req, res) => {
   res.status(200).json({
