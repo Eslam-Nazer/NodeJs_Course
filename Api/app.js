@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const dotenv = require("dotenv");
 const app = express();
 const port = 4000;
 
@@ -9,6 +10,7 @@ const logger = (req, res, next) => {
 };
 
 app.use(express.json());
+dotenv.config({ path: "./config.env" });
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(logger);
@@ -53,7 +55,4 @@ app.use((req, res, next) => {
 const moviesRouter = require("./Routes/MoviesRoutes");
 app.use("/api/movies", moviesRouter);
 
-module.exports = {
-  app: app,
-  port: port,
-};
+module.exports = app;
