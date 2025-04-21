@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { body, validationResult } = require("express-validator");
 let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
+const moviesModel = require("./../Model/MovieModel");
 
 exports.checkId = (req, res, next, value) => {
   console.log(`Id is ${value}`);
@@ -18,7 +19,6 @@ exports.checkId = (req, res, next, value) => {
 
 exports.validateMovies = [
   body("name").notEmpty().withMessage("Name is required"),
-  body("description").notEmpty().withMessage("Description is required"),
   body("duration").notEmpty().withMessage("Duration is required"),
   (req, res, next) => {
     const errors = validationResult(req);
@@ -35,17 +35,6 @@ exports.validateMovies = [
     next();
   },
 ];
-// exports.validateBody = (req, res, next) => {
-// if (!req.body.name || !req.body.description || !req.body.duration) {
-//   return res.status(400).json({
-//     status: "fail",
-//     message: `Invalid body data`,
-//   });
-// }
-//   body('name').notE
-
-//   next();
-// };
 
 exports.getAllMovies = (req, res) => {
   res.status(200).json({
@@ -58,49 +47,30 @@ exports.getAllMovies = (req, res) => {
   });
 };
 
-exports.addNewMovie = (req, res) => {
-  if (!req.body) {
-    return res.status(400).json({
-      status: "fail",
-      message: "No data provided",
+exports.addNewMovie = async (req, res) => {
+  try {
+    const newMovie = await moviesModel.create({
+      name: req.body.name,
+      description: req.body.description,
+      duration: req.body.duration,
+      rating: req.body.rating,
     });
-  }
-
-  const newId = movies[movies.length - 1].id + 1;
-
-  let newMove = Object.assign({ id: newId }, req.body);
-
-  movies.push(newMove);
-
-  fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
-    if (err) {
-      res.status(500).json({
-        status: "fail",
-        message: "Error writing to file",
-      });
-    }
 
     res.status(201).json({
       status: "success",
       data: {
-        movie: newMove,
+        movie: newMovie,
       },
     });
-  });
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
 };
 
 exports.getMovieById = (request, response) => {
-  // const id = request.params.id;
-
-  // let movie = movies.find((el) => el.id === Number(id));
-
-  // if (!movie) {
-  //   return response.status(404).json({
-  //     status: "fail",
-  //     message: "Movie not found",
-  //   });
-  // }
-
   response.status(200).json({
     status: "success",
     data: {
@@ -116,17 +86,6 @@ exports.updateMovieById = (request, response) => {
       message: "No data provided",
     });
   }
-
-  // const id = request.params.id;
-
-  // let movie = movies.find((el) => el.id === Number(id));
-
-  // if (!movie) {
-  //   return response.status(404).json({
-  //     status: "fail",
-  //     message: "Movie not found",
-  //   });
-  // }
 
   const index = movies.indexOf(movie);
 
@@ -151,24 +110,6 @@ exports.updateMovieById = (request, response) => {
 };
 
 exports.deleteMovieById = (request, response) => {
-  // if (!request.params) {
-  //   response.status(400).json({
-  //     status: "fail",
-  //     message: "No data provided",
-  //   });
-  // }
-
-  // const id = request.params.id;
-
-  // let movie = movies.find((el) => el.id === Number(id));
-
-  // if (!movie) {
-  //   return response.status(404).json({
-  //     status: "fail",
-  //     message: "Movie not found",
-  //   });
-  // }
-
   const index = movies.indexOf(request.movie);
 
   movies.splice(index, 1);

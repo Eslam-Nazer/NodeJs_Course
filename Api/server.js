@@ -1,32 +1,20 @@
 const app = require("./app");
-const mongoose = require("mongoose");
 
-// console.log(process.env.PORT);
-mongoose
-  .connect(process.env.MONGO_URL)
-  .then((conn) => {
-    // console.log(conn);
-    console.log("Connected to MongoDB");
-  })
-  .catch((error) => {
-    console.log("Error while connecting to MongoDB", error);
-  });
+// const testMovie = new MovieModel({
+//   name: "Test Movie",
+//   description: "This is a test movie",
+//   duration: 120,
+//   rating: 5,
+// });
 
-const movieSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Name is required"],
-    unique: true,
-  },
-  description: String,
-  duration: {
-    type: Number,
-    required: [true, "Duration is required"],
-  },
-  rating: Number,
-});
-
-const MovieModel = mongoose.model("MovieModel", movieSchema);
+// testMovie
+//   .save()
+//   .then((test) => {
+//     console.log(test);
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
