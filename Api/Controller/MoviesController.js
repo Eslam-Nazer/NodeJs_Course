@@ -6,23 +6,22 @@ let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
  */
 const moviesModel = require("./../Model/MovieModel");
 
-// exports.checkId = (req, res, next, value) => {
-//   console.log(`Id is ${value}`);
-
-//   let movie = movies.find((el) => el.id === Number(value));
-//   if (!movie) {
-//     return res.status(404).json({
-//       status: "fail",
-//       message: `Movie with ID ${value} not found`,
-//     });
-//   }
-//   req.movie = movie;
-//   next();
-// };
-
 exports.validateMovies = [
-  body("name").notEmpty().withMessage("Name is required"),
-  body("duration").notEmpty().withMessage("Duration is required"),
+  body("name").notEmpty().withMessage("Name is required").isString(),
+  body("description")
+    .notEmpty()
+    .withMessage("description is required")
+    .isString(),
+  body("duration").notEmpty().isNumeric(),
+  body("rating").optional().isNumeric(),
+  body("totalRatings").optional().isNumeric(),
+  body("releaseYear").notEmpty().isNumeric(),
+  body("releaseDate").notEmpty(),
+  body("createdAt").optional(),
+  body("genres").notEmpty(),
+  body("image").notEmpty().isString(),
+  body("actors").notEmpty(),
+  body("price").notEmpty(),
   (req, res, next) => {
     const errors = validationResult(req);
 
@@ -48,14 +47,6 @@ exports.validateMovies = [
  * @return {Promise<void>}
  */
 exports.getAllMovies = async (req, res) => {
-  // res.status(200).json({
-  //   status: "success",
-  //   requestedAt: req.requestAt,
-  //   count: movies.length,
-  //   data: {
-  //     movies: movies,
-  //   },
-  // });
   try {
     const movies = await moviesModel.find();
 
@@ -80,6 +71,13 @@ exports.addNewMovie = async (req, res) => {
       description: req.body.description,
       duration: req.body.duration,
       rating: req.body.rating,
+      totalRatings: req.body.totalRatings,
+      releaseYear: req.body.releaseYear,
+      releaseDate: req.body.releaseDate,
+      genres: req.body.genres,
+      image: req.body.image,
+      actors: req.body.actors,
+      price: req.body.price,
     });
 
     res.status(201).json({
