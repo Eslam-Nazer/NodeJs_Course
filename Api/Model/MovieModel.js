@@ -1,10 +1,8 @@
 const mongoose = require("mongoose");
 
-// console.log(process.env.PORT);
 mongoose
   .connect(process.env.MONGO_URL)
   .then((conn) => {
-    // console.log(conn);
     console.log("Connected to MongoDB");
   })
   .catch((error) => {
