@@ -102,14 +102,7 @@ exports.addNewMovie = async (req, res) => {
  * @return {Promise<void>}
  */
 exports.getMovieById = async (request, response) => {
-  // response.status(200).json({
-  //   status: "success",
-  //   data: {
-  //     movie: request.movie,
-  //   },
-  // });
   try {
-    // const movie = await moviesModel.find({_id: request.params.id});
     const movie = await moviesModel.findById(request.params.id);
     response.status(200).json({
       status: "success",
@@ -127,30 +120,6 @@ exports.getMovieById = async (request, response) => {
 };
 
 exports.updateMovieById = async (request, response) => {
-  // if (!request.body) {
-  //   return response.status(400).json({
-  //     status: "fail",
-  //     message: "No data provided",
-  //   });
-  // }
-  // const index = movies.indexOf(movie);
-  // let movie = Object.assign(request.movie, request.body);
-  // movies[index] = movie;
-  // fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
-  //   if (err) {
-  //     return response.status(500).json({
-  //       status: "fail",
-  //       message: "Error writing to file",
-  //     });
-  //   }
-  //   response.status(200).json({
-  //     status: "success",
-  //     data: {
-  //       movie: movie,
-  //     },
-  //   });
-  // });
-
   try {
     const updateMovie = await moviesModel.findByIdAndUpdate(
       request.params.id,
@@ -182,20 +151,6 @@ exports.updateMovieById = async (request, response) => {
  * @returns {Promise<void>}
  */
 exports.deleteMovieById = async (request, response) => {
-  // const index = movies.indexOf(request.movie);
-  // movies.splice(index, 1);
-  // fs.writeFile("./data/movies.json", JSON.stringify(movies), (err) => {
-  //   if (err) {
-  //     return response.status(500).json({
-  //       status: "fail",
-  //       message: "Error writing to file",
-  //     });
-  //   }
-  //   response.status(204).json({
-  //     status: "success",
-  //     data: null,
-  //   });
-  // });
   try {
     const deleteMovie = await moviesModel.findByIdAndDelete(request.params.id);
 
