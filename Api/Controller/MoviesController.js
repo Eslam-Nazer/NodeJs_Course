@@ -48,7 +48,7 @@ exports.validateMovies = [
  */
 exports.getAllMovies = async (req, res) => {
   try {
-    const movies = await moviesModel.find();
+    const movies = await moviesModel.find(req.query);
 
     res.status(200).json({
       status: "success",
