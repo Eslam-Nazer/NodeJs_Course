@@ -5,6 +5,7 @@ let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
  * @type {import("mongoose").Model<import('./../Model/MovieModel')>}
  */
 const moviesModel = require("./../Model/MovieModel");
+const ApiFeatures = require("./../Utils/ApiFeatures");
 
 exports.validateMovies = [
   body("name").notEmpty().withMessage("Name is required").isString(),
@@ -42,17 +43,22 @@ exports.validateMovies = [
  * Get all movies
  * @async
  * @function getAllMovies
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @param {import('express').Request} request
+ * @param {import('express').Response} response
  * @return {Promise<void>}
  */
-exports.getAllMovies = async (req, res) => {
+exports.getAllMovies = async (request, response) => {
   try {
-    const movies = await moviesModel.find(req.query);
+    const features = new ApiFeatures(moviesModel.find(), request.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    let movies = await features.query;
 
-    res.status(200).json({
+    response.status(200).json({
       status: "success",
-      requestedAt: req.requestAt,
+      requestedAt: request.requestAt,
       count: movies.length,
       data: {
         movies: movies,
@@ -60,7 +66,7 @@ exports.getAllMovies = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(400).json({ status: "fail", message: error.message });
+    response.status(400).json({ status: "fail", message: error.message });
   }
 };
 
