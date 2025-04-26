@@ -54,5 +54,11 @@ app.use((req, res, next) => {
  */
 const moviesRouter = require("./Routes/MoviesRoutes");
 app.use("/api/movies", moviesRouter);
+app.all(/[\s\S]*.*[\s\S]*/gm, (request, response, next) => {
+  response.status(404).json({
+    status: "fail",
+    message: `Route ${request.originalUrl} not found`,
+  });
+});
 
 module.exports = app;
