@@ -95,6 +95,11 @@ movieSchema.post("save", function (doc, next) {
   next();
 });
 
+movieSchema.pre("find", function (next) {
+  this.find().select("name price duration");
+  next();
+});
+
 const MovieModel = mongoose.model("MovieModel", movieSchema);
 
 module.exports = MovieModel;
