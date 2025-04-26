@@ -6,6 +6,7 @@ let movies = JSON.parse(fs.readFileSync("./data/movies.json", "utf-8"));
  */
 const moviesModel = require("./../Model/MovieModel");
 const ApiFeatures = require("./../Utils/ApiFeatures");
+const asyncErrorHandler = require("./../Utils/AsyncErrorHandler");
 
 exports.validateMovies = [
   body("name").notEmpty().withMessage("Name is required").isString(),
@@ -70,35 +71,35 @@ exports.getAllMovies = async (request, response) => {
   }
 };
 
-exports.addNewMovie = async (req, res) => {
-  try {
-    const newMovie = await moviesModel.create({
-      name: req.body.name,
-      description: req.body.description,
-      duration: req.body.duration,
-      rating: req.body.rating,
-      totalRatings: req.body.totalRatings,
-      releaseYear: req.body.releaseYear,
-      releaseDate: req.body.releaseDate,
-      genres: req.body.genres,
-      image: req.body.image,
-      actors: req.body.actors,
-      price: req.body.price,
-    });
+exports.addNewMovie = asyncErrorHandler(async (req, res) => {
+  // try {
+  const newMovie = await moviesModel.create({
+    name: req.body.name,
+    description: req.body.description,
+    duration: req.body.duration,
+    rating: req.body.rating,
+    totalRatings: req.body.totalRatings,
+    releaseYear: req.body.releaseYear,
+    releaseDate: req.body.releaseDate,
+    genres: req.body.genres,
+    image: req.body.image,
+    actors: req.body.actors,
+    price: req.body.price,
+  });
 
-    res.status(201).json({
-      status: "success",
-      data: {
-        movie: newMovie,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
-};
+  res.status(201).json({
+    status: "success",
+    data: {
+      movie: newMovie,
+    },
+  });
+  // } catch (error) {
+  // res.status(400).json({
+  // status: "fail",
+  // message: error.message,
+  // });
+  // }
+});
 
 /**
  * get movie by id

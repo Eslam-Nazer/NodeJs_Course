@@ -70,6 +70,7 @@ app.use((error, request, response, next) => {
   error.status = error.status || "error";
   response.status(error.statusCode).json({
     status: error.status,
+    statusCode: error.statusCode,
     message: `error: ${error.message}`,
   });
 });
