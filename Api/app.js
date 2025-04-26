@@ -53,15 +53,14 @@ app.use((req, res, next) => {
  * @description refactoring the code and shane the methods
  */
 const moviesRouter = require("./Routes/MoviesRoutes");
+const CustomErrors = require("./Utils/CustomErrors");
 app.use("/api/movies", moviesRouter);
 app.all(/[\s\S]*.*[\s\S]*/gm, (request, response, next) => {
   // response.status(404).json({
   //   status: "fail",
   //   message: `Route ${request.originalUrl} not found`,
   // });
-  const error = new Error(`Route ${request.originalUrl} not found`);
-  error.status = "fail";
-  error.statusCode = 404;
+  const error = new CustomErrors(`Route ${request.originalUrl} not found`, 404);
 
   next(error);
 });
