@@ -2,6 +2,9 @@ const express = require("express");
 const moviesController = require("./../Controller/MoviesController");
 
 const router = express.Router();
+
+router.route("/stats").get(moviesController.getMoviesStats);
+
 router
   .route("/")
   .get(moviesController.getAllMovies)

@@ -172,3 +172,34 @@ exports.deleteMovieById = async (request, response) => {
     });
   }
 };
+
+/**
+ * get movies stats
+ * @async
+ * @param {import('express').Request} request
+ * @param {import('express').Response} response
+ * @returns {Promise<void>}
+ */
+exports.getMoviesStats = async (request, response) => {
+  try {
+    const stats = await moviesModel.aggregate([
+      { $match: { rating: { $gte: 4.5 } } },
+    ]);
+
+    response.status(200).json({
+      status: "success",
+      requestedAt: request.requestAt,
+      count: stats.length,
+      data: {
+        stats: stats,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+
+    response.status(400).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
+};
