@@ -55,9 +55,23 @@ app.use((req, res, next) => {
 const moviesRouter = require("./Routes/MoviesRoutes");
 app.use("/api/movies", moviesRouter);
 app.all(/[\s\S]*.*[\s\S]*/gm, (request, response, next) => {
-  response.status(404).json({
-    status: "fail",
-    message: `Route ${request.originalUrl} not found`,
+  // response.status(404).json({
+  //   status: "fail",
+  //   message: `Route ${request.originalUrl} not found`,
+  // });
+  const error = new Error(`Route ${request.originalUrl} not found`);
+  error.status = "fail";
+  error.statusCode = 404;
+
+  next(error);
+});
+
+app.use((error, request, response, next) => {
+  error.statusCode = error.statusCode || 500;
+  error.status = error.status || "error";
+  response.status(error.statusCode).json({
+    status: error.status,
+    message: `error: ${error.message}`,
   });
 });
 
