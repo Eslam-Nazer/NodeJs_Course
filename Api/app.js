@@ -53,8 +53,10 @@ app.use((req, res, next) => {
  * @description refactoring the code and shane the methods
  */
 const moviesRouter = require("./Routes/MoviesRoutes");
+const authRouter = require("./Routes/authRouter");
 const CustomErrors = require("./Utils/CustomErrors");
 app.use("/api/movies", moviesRouter);
+app.use("/api/users", authRouter);
 app.all(/[\s\S]*.*[\s\S]*/gm, (request, response, next) => {
   // response.status(404).json({
   //   status: "fail",
