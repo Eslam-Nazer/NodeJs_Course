@@ -26,6 +26,7 @@ let userSchema = mongoose.Schema({
       },
       message: "Passwords and confirmPassword do not match",
     },
+    select: false,
   },
   // confirmPassword: {
   //   type: String,
@@ -58,6 +59,10 @@ userSchema.pre("save", function (next) {
     next();
   });
 });
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 const UserModel = mongoose.model("UserModel", userSchema);
 

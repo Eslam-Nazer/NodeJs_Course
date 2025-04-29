@@ -2,6 +2,8 @@ const { body, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const UserModel = require("./../Model/UserModel");
 const AsyncErrorHandler = require("../Utils/AsyncErrorHandler");
+const CustomErrors = require("../Utils/CustomErrors");
+const bcrypt = require("bcryptjs");
 
 exports.userValidation = [
   body("name").notEmpty().withMessage("Name is required").isString(),
@@ -54,5 +56,64 @@ exports.signup = AsyncErrorHandler(async (request, response, next) => {
     data: {
       user: user,
     },
+  });
+});
+
+exports.loginValidate = [
+  body("email").notEmpty().withMessage("Email is required").isEmail(),
+  body("password").notEmpty().withMessage("Password is required").isString(),
+  (request, response, next) => {
+    const errors = validationResult(request);
+
+    if (!errors.isEmpty()) {
+      return response.status(400).json({
+        status: "fail",
+        requestedAt: request.requestAt,
+        statusCode: 400,
+        errors: errors.array().map((err) => ({
+          msg: err.msg,
+          param: err.param,
+          path: err.path,
+        })),
+      });
+    }
+    next();
+  },
+];
+
+exports.login = AsyncErrorHandler(async (request, response, next) => {
+  const email = request.body.email;
+  const password = request.body.password;
+
+  const user = await UserModel.findOne({ email }).select("+password");
+
+  if (!user) {
+    const error = new CustomErrors("User not found", 404);
+    return next(error);
+  }
+
+  const match = await user.comparePassword(password);
+  if (!match) {
+    const error = new CustomErrors("Invalid credentials", 401);
+    return next(error);
+  }
+
+  const token = jwt.sign(
+    {
+      id: user._id,
+      username: user.name,
+    },
+    process.env.SECRET_STR,
+    {
+      expiresIn: process.env.LOGIN_EXPIRES,
+    }
+  );
+
+  return response.status(200).json({
+    status: "success",
+    requestedAt: request.requestAt,
+    statusCode: 200,
+    token: token,
+    user: user,
   });
 });
