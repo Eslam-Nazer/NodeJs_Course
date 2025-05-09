@@ -162,3 +162,22 @@ exports.restrict = (...rule) => {
         return next(new CustomErrors('You have not permitted ', 403));
     }
 }
+
+exports.forgetPassword = AsyncErrorHandler(async (request, response, next) => {
+    // 1. GET USER BASED ON POSTED EMAIL
+    const user = await UserModel.findOne({email: request.body.email});
+
+    console.log(user);
+    if (!user) {
+        return next(new CustomErrors("Undefined this user this email not found. You can register", 404));
+    }
+
+    // 2. GENERATE A RANDOM RESET TOKEN
+    const resetToker = await user.createResetPasswordToken();
+    await user.save();
+
+    // 3. SEND TOKEN TO USER VIA EMAIL
+})
+
+exports.resetPassword = (req, res, next) => {
+}
