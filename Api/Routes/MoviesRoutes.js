@@ -13,7 +13,7 @@ router
 router
     .route("/:id")
     .get(AuthController.protected, moviesController.getMovieById)
-    .patch(AuthController.protected, moviesController.updateMovieById)
-    .delete(AuthController.protected, moviesController.deleteMovieById);
+    .patch(AuthController.protected, AuthController.restrict('admin'), moviesController.updateMovieById)
+    .delete(AuthController.protected, AuthController.restrict('admin'), moviesController.deleteMovieById);
 
 module.exports = router;

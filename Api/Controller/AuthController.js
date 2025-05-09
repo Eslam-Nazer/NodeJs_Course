@@ -153,3 +153,12 @@ exports.protected = AsyncErrorHandler(async (request, response, next) => {
 
     return next();
 });
+
+exports.restrict = (...rule) => {
+    return (request, response, next) => {
+        if (rule.includes(request.user.rule)) {
+            return next();
+        }
+        return next(new CustomErrors('You have not permitted ', 403));
+    }
+}

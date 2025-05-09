@@ -15,6 +15,11 @@ let userSchema = mongoose.Schema({
         trim: true,
         validate: [validator.isEmail, "Please provide a valid email"],
     },
+    rule: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user',
+    },
     password: {
         type: String,
         required: [true, "Password is required"],
@@ -63,6 +68,21 @@ userSchema.pre("save", function (next) {
         next();
     });
 });
+
+userSchema.pre('save', async function (next) {
+    if (this.isNew) {
+        try {
+            const userCount = await this.constructor.countDocuments();
+            // console.log(userCount);
+            if (userCount === 0) {
+                this.rule = 'admin';
+            }
+        } catch (error) {
+            return next(error);
+        }
+    }
+    next();
+})
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
