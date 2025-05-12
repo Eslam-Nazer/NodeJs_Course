@@ -5,6 +5,7 @@ const AsyncErrorHandler = require("../Utils/AsyncErrorHandler");
 const CustomErrors = require("../Utils/CustomErrors");
 const bcrypt = require("bcryptjs");
 const util = require("util");
+const sendEmail = require("../Utils/EmailFeature");
 
 exports.userValidation = [
     body("name").notEmpty().withMessage("Name is required").isString(),
@@ -177,7 +178,25 @@ exports.forgetPassword = AsyncErrorHandler(async (request, response, next) => {
     await user.save();
 
     // 3. SEND TOKEN TO USER VIA EMAIL
-})
+    const resetUrl = `${request.protocol}://${request.host}/api/users/resetPassword/${resetToker}`;
+    let textMessage = `Use this link to reset password: ${resetUrl} \n\n remember this link available for 10 minutes `;
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'Password Reset Request',
+            text: textMessage,
+        });
+        response.status(200).json({
+            status: "success",
+            message: "Password reset link sent successfully to your email",
+        })
+    } catch (error) {
+        user.passwordResetToken = undefined;
+        user.ResetPasswordTokenExpires = undefined;
+        user.save();
+        return next(new CustomErrors(`There was an error with email ${error.message}`, 500));
+    }
+});
 
 exports.resetPassword = (req, res, next) => {
 }
