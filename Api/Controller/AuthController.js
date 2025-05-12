@@ -6,6 +6,7 @@ const CustomErrors = require("../Utils/CustomErrors");
 const bcrypt = require("bcryptjs");
 const util = require("util");
 const sendEmail = require("../Utils/EmailFeature");
+const crypto = require("crypto");
 
 exports.userValidation = [
     body("name").notEmpty().withMessage("Name is required").isString(),
@@ -198,5 +199,38 @@ exports.forgetPassword = AsyncErrorHandler(async (request, response, next) => {
     }
 });
 
-exports.resetPassword = (req, res, next) => {
-}
+exports.resetPassword = AsyncErrorHandler(async (request, response, next) => {
+    const token = crypto.createHash('sha256').update(request.params.token).digest('hex');
+    const user = await UserModel.findOne({ResetPasswordToken: token, ResetPasswordTokenExpires: {$gt: Date.now()}})
+
+    if (!user) {
+        const error = new CustomErrors("Invalid token or token has ben expired", 403);
+        next(error);
+    }
+
+    try {
+        // console.log(request.body.password, request.body.confirmPassword)
+        user.password = request.body.password;
+        user.confirmPassword = request.body.confirmPassword;
+        user.passwordResetToken = undefined;
+        user.ResetPasswordTokenExpires = undefined;
+        user.passwordChangedAt = Date.now();
+    } catch (error) {
+        next(new CustomErrors(`There was an error with email ${error.message}`, 500));
+    }
+
+    user.save();
+
+    const loginToken = jwt.sign(
+        {id: user._id, username: user.name},
+        process.env.SECRET_STR,
+        {
+            expiresIn: process.env.LOGIN_EXPIRES,
+        }
+    );
+
+    response.status(200).json({
+        status: "success",
+        token: loginToken,
+    });
+});
