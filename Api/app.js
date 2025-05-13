@@ -5,18 +5,18 @@ const app = express();
 const port = 4000;
 
 const logger = (req, res, next) => {
-  console.log(`this is middleware: ${req.method} ${req.url}`);
-  next();
+    console.log(`this is middleware: ${req.method} ${req.url}`);
+    next();
 };
 
 app.use(express.json());
-dotenv.config({ path: "./config.env" });
-app.use(express.urlencoded({ extended: true }));
+dotenv.config({path: "./config.env"});
+app.use(express.urlencoded({extended: true}));
 app.use(morgan("dev"));
 app.use(logger);
 app.use((req, res, next) => {
-  req.requestAt = new Date().toISOString();
-  next();
+    req.requestAt = new Date().toISOString();
+    next();
 });
 
 /**
@@ -54,27 +54,29 @@ app.use((req, res, next) => {
  */
 const moviesRouter = require("./Routes/MoviesRoutes");
 const authRouter = require("./Routes/authRouter");
+const userRouter = require("./Routes/UserRoutes");
 const CustomErrors = require("./Utils/CustomErrors");
 app.use("/api/movies", moviesRouter);
-app.use("/api/users", authRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/users", userRouter);
 app.all(/[\s\S]*.*[\s\S]*/gm, (request, response, next) => {
-  // response.status(404).json({
-  //   status: "fail",
-  //   message: `Route ${request.originalUrl} not found`,
-  // });
-  const error = new CustomErrors(`Route ${request.originalUrl} not found`, 404);
+    // response.status(404).json({
+    //   status: "fail",
+    //   message: `Route ${request.originalUrl} not found`,
+    // });
+    const error = new CustomErrors(`Route ${request.originalUrl} not found`, 404);
 
-  next(error);
+    next(error);
 });
 
 app.use((error, request, response, next) => {
-  error.statusCode = error.statusCode || 500;
-  error.status = error.status || "error";
-  response.status(error.statusCode).json({
-    status: error.status,
-    statusCode: error.statusCode,
-    message: `error: ${error.message}`,
-  });
+    error.statusCode = error.statusCode || 500;
+    error.status = error.status || "error";
+    response.status(error.statusCode).json({
+        status: error.status,
+        statusCode: error.statusCode,
+        message: `error: ${error.message}`,
+    });
 });
 
 module.exports = app;

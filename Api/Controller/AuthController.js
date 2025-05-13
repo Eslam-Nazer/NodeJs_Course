@@ -231,20 +231,3 @@ exports.resetPassword = AsyncErrorHandler(async (request, response, next) => {
     senderResponse(user, 200, response)
 });
 
-exports.updatePassword = AsyncErrorHandler(async (request, response, next) => {
-    // Get current user data from database
-    const user = await UserModel.findById(request.user._id).select('+password');
-
-    // Check if the current password is correct
-    if (!(await user.comparePassword(request.body.currentPassword, user.password))) {
-        return next(new CustomErrors("Invalid password", 401));
-    }
-    // if password is correct update password with new value
-    user.password = request.body.password;
-    user.confirmPassword = request.body.confirmPassword;
-    await user.save();
-
-    // Login user and send jwt
-    senderResponse(user, 200, response);
-});
-
