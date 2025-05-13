@@ -35,6 +35,30 @@ exports.userValidation = [
     },
 ];
 
+const signToken = (id, username) => {
+    let token;
+    token = jwt.sign(
+        {id: id, username: username},
+        process.env.SECRET_STR,
+        {
+            expiresIn: process.env.LOGIN_EXPIRES,
+        }
+    );
+    return token;
+}
+
+const senderResponse = (user, statusCode, response) => {
+    const token = signToken(user._id, user.password);
+
+    response.status(statusCode).json({
+        status: "success",
+        token: token,
+        data: {
+            user,
+        }
+    })
+}
+
 exports.signup = AsyncErrorHandler(async (request, response, next) => {
     let user = await UserModel.create({
         name: request.body.name,
@@ -101,24 +125,7 @@ exports.login = AsyncErrorHandler(async (request, response, next) => {
         return next(error);
     }
 
-    const token = jwt.sign(
-        {
-            id: user._id,
-            username: user.name,
-        },
-        process.env.SECRET_STR,
-        {
-            expiresIn: process.env.LOGIN_EXPIRES,
-        }
-    );
-
-    return response.status(200).json({
-        status: "success",
-        requestedAt: request.requestAt,
-        statusCode: 200,
-        token: token,
-        // user: user,
-    });
+    senderResponse(user, 200, response);
 });
 
 exports.protected = AsyncErrorHandler(async (request, response, next) => {
@@ -221,16 +228,23 @@ exports.resetPassword = AsyncErrorHandler(async (request, response, next) => {
 
     user.save();
 
-    const loginToken = jwt.sign(
-        {id: user._id, username: user.name},
-        process.env.SECRET_STR,
-        {
-            expiresIn: process.env.LOGIN_EXPIRES,
-        }
-    );
-
-    response.status(200).json({
-        status: "success",
-        token: loginToken,
-    });
+    senderResponse(user, 200, response)
 });
+
+exports.updatePassword = AsyncErrorHandler(async (request, response, next) => {
+    // Get current user data from database
+    const user = await UserModel.findById(request.user._id).select('+password');
+
+    // Check if the current password is correct
+    if (!(await user.comparePassword(request.body.currentPassword, user.password))) {
+        return next(new CustomErrors("Invalid password", 401));
+    }
+    // if password is correct update password with new value
+    user.password = request.body.password;
+    user.confirmPassword = request.body.confirmPassword;
+    await user.save();
+
+    // Login user and send jwt
+    senderResponse(user, 200, response);
+});
+
