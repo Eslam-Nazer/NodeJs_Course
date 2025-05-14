@@ -56,6 +56,11 @@ let userSchema = mongoose.Schema({
     ResetPasswordTokenExpires: {
         type: Date,
         required: false,
+    },
+    active: {
+        type: Boolean,
+        default: false,
+        select: false,
     }
 });
 

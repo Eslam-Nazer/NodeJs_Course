@@ -3,6 +3,7 @@ const UserModel = require("../Model/UserModel");
 const CustomErrors = require("../Utils/CustomErrors");
 const jwt = require("jsonwebtoken");
 const {request, response} = require("express");
+require("dotenv").config();
 
 const signToken = (id, username) => {
     let token;
@@ -19,6 +20,19 @@ const signToken = (id, username) => {
 const senderResponse = (user, statusCode, response) => {
     const token = signToken(user._id, user.password);
 
+    const options = {
+        httpOnly: true,
+        secure: true,
+        maxAge: process.env.LOGIN_EXPIRES
+    };
+
+    if (process.env.NODE_ENV === "PRODUCTION") {
+        options.secure = true;
+    }
+
+    user.password = undefined;
+
+    response.cookie("jwt", token, options);
     response.status(statusCode).json({
         status: "success",
         token: token,
@@ -68,3 +82,12 @@ const filterRequest = (object, ...allowFields) => {
     });
     return newObject;
 }
+
+exports.deleteUser = AsyncErrorHandler(async (request, response, next) => {
+    await UserModel.findByIdAndUpdate(request.user._id, {active: true});
+
+    response.status(204).json({
+        status: "success",
+        data: {}
+    }).end();
+});
