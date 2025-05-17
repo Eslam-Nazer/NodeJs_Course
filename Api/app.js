@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const app = express();
 const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 const port = 4000;
 
 let limiter = rateLimit({
@@ -12,13 +13,16 @@ let limiter = rateLimit({
 });
 
 app.use('/api', limiter);
+app.use(helmet());
 
 const logger = (req, res, next) => {
     console.log(`this is middleware: ${req.method} ${req.url}`);
     next();
 };
 
-app.use(express.json());
+app.use(express.json({
+    limit: "50kb",
+}));
 dotenv.config({path: "./config.env"});
 app.use(express.urlencoded({extended: true}));
 app.use(morgan("dev"));
