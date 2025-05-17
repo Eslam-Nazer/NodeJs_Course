@@ -2,7 +2,16 @@ const express = require("express");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const app = express();
+const rateLimit = require("express-rate-limit");
 const port = 4000;
+
+let limiter = rateLimit({
+    max: 1000,
+    windowMs: 1000 * 60 * 60,
+    message: "We have received too many requests from this ip, try again later.",
+});
+
+app.use('/api', limiter);
 
 const logger = (req, res, next) => {
     console.log(`this is middleware: ${req.method} ${req.url}`);
