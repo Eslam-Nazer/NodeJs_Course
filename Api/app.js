@@ -4,6 +4,8 @@ const dotenv = require("dotenv");
 const app = express();
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+const sanitizer = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 const port = 4000;
 
 let limiter = rateLimit({
@@ -14,6 +16,8 @@ let limiter = rateLimit({
 
 app.use('/api', limiter);
 app.use(helmet());
+app.use(sanitizer());
+app.use(xss());
 
 const logger = (req, res, next) => {
     console.log(`this is middleware: ${req.method} ${req.url}`);
